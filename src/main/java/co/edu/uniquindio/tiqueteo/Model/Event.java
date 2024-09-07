@@ -2,25 +2,29 @@ package co.edu.uniquindio.tiqueteo.Model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
 
 @Document
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class User {
-    String name;
-    String email;
-    String password;
-    String address;
-    String phone;
-    String idUser;
+public class Event {
 
-    @Id @EqualsAndHashCode.Include
+    @Id
     String id;
 
+    String name;
+    String address;
+    String description;
+    EventType type;
+    String image;
+    String location;
+    String date;
+
+    List<Locality> localities;
 
 }

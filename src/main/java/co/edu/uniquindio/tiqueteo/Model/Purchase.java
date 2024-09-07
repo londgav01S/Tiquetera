@@ -11,16 +11,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class User {
-    String name;
-    String email;
-    String password;
-    String address;
-    String phone;
-    String idUser;
+public class Purchase {
 
-    @Id @EqualsAndHashCode.Include
+    @Id
+    @EqualsAndHashCode.Include()
     String id;
-
-
+    String orderCode;
+    String userId;
+    Double total;
+    String date;
+    PurcheseDetail detail;
 }
