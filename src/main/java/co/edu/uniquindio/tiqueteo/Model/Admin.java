@@ -16,4 +16,5 @@ import java.util.List;
 public class Admin extends User{
     List<Coupon> couponList = new ArrayList<>();
     List<Event> eventList = new ArrayList<>();
+
 }

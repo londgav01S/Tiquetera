@@ -1,22 +1,22 @@
 package co.edu.uniquindio.tiqueteo.Model;
 
 
+import co.edu.uniquindio.tiqueteo.Model.Enums.PurchaseState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PurcheseDetail {
+public class PurchaseDetail {
 
     @Id
     String id;
     String payMethod;
-    PurcheseState state;
+    PurchaseState state;
     String reference;
 
 }

@@ -20,5 +20,5 @@ public class Purchase {
     String userId;
     Double total;
     String date;
-    PurcheseDetail detail;
+    PurchaseDetail detail;
 }
