@@ -1,10 +1,7 @@
 package co.edu.uniquindio.tiqueteo.Model;
 
 import co.edu.uniquindio.tiqueteo.Model.Enums.EventType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,6 +12,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class Event {
 
     @Id @EqualsAndHashCode.Include

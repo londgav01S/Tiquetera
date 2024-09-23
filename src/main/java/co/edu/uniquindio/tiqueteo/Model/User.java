@@ -17,7 +17,7 @@ public abstract class User {
     String password;
     String address;
     String phone;
-    String idUser;
+
 
     @Id @EqualsAndHashCode.Include
     String id;

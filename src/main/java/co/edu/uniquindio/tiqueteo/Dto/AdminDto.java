@@ -1,14 +1,14 @@
 package co.edu.uniquindio.tiqueteo.Dto;
 
-import co.edu.uniquindio.tiqueteo.Model.Coupon;
-import co.edu.uniquindio.tiqueteo.Model.Event;
+import java.io.Serializable;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.*;
 
-public record AdminDto(
-        List<CouponDto> couponList,
-        List<EventDto> eventList
-) {
+@Data
+@NoArgsConstructor
+@ToString
+@Builder
+public class AdminDto {
+
 
 }
