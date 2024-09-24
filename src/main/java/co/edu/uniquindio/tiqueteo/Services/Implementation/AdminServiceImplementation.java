@@ -1,5 +1,6 @@
 package co.edu.uniquindio.tiqueteo.Services.Implementation;
 
+import co.edu.uniquindio.tiqueteo.Dto.AdminDto;
 import co.edu.uniquindio.tiqueteo.Dto.EventDto;
 import co.edu.uniquindio.tiqueteo.Model.Admin;
 import co.edu.uniquindio.tiqueteo.Model.Event;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminServiceImplementation implements iAdminService {
@@ -21,60 +23,81 @@ public class AdminServiceImplementation implements iAdminService {
     @Autowired
     private UserRepository userRepository;
 
-    // Crear un nuevo administrador
-    @Override
-    public Admin createAdmin(Admin admin) {
-        return userRepository.save(admin);  // Guardar el administrador en MongoDB
+    // Convertir AdminDto a Admin (convierte de DTO a entidad)
+    private Admin toEntity(AdminDto adminDto) {
+        Admin admin = new Admin();
+        admin.setId(adminDto.getId());
+        admin.setName(adminDto.getName());
+        admin.setEmail(adminDto.getEmail());
+        admin.setAddress(adminDto.getAddress());
+        admin.setPhone(adminDto.getPhone());
+        admin.setRole(adminDto.getRole() != null ? adminDto.getRole() : "ADMIN");  // Asigna rol predeterminado si no se pasa
+        return admin;
     }
 
+    // Convertir Admin a AdminDto (convierte de entidad a DTO)
+    private AdminDto toDto(Admin admin) {
+        return new AdminDto(admin.getId(), admin.getName(), admin.getEmail(), admin.getAddress(), admin.getPhone(), admin.getRole());
+    }
 
-    // Actualizar un administrador existente
     @Override
-    public Admin updateAdmin(Admin admin) {
+    public AdminDto createAdmin(AdminDto adminDto) {
+        Admin admin = toEntity(adminDto);  // Convierte DTO a entidad
+        Admin savedAdmin = userRepository.save(admin);  // Guarda el admin en MongoDB
+        return toDto(savedAdmin);  // Convierte entidad a DTO y devuelve
+    }
+
+    @Override
+    public AdminDto updateAdmin(AdminDto adminDto) {
         // Buscar el admin por su ID en la base de datos
-        Optional<User> existingUser = userRepository.findById(admin.getId());
+        Optional<User> existingUser = userRepository.findById(adminDto.getId());
 
+        // Verifica que el usuario encontrado sea un Admin
         if (existingUser.isPresent() && existingUser.get() instanceof Admin) {
+            Admin adminToUpdate = (Admin) existingUser.get();  // Hacemos casting a Admin
             // Actualizar los campos necesarios
-            Admin updatedAdmin = (Admin) existingUser.get();
-            updatedAdmin.setName(admin.getName());
-            updatedAdmin.setEmail(admin.getEmail());
-            updatedAdmin.setAddress(admin.getAddress());
-            updatedAdmin.setPhone(admin.getPhone());
-            updatedAdmin.setPassword(admin.getPassword());  // Considera si quieres o no cambiar la contraseña
-
-            return userRepository.save(updatedAdmin);  // Guardar los cambios en la base de datos
+            adminToUpdate.setName(adminDto.getName());
+            adminToUpdate.setEmail(adminDto.getEmail());
+            adminToUpdate.setAddress(adminDto.getAddress());
+            adminToUpdate.setPhone(adminDto.getPhone());
+            Admin updatedAdmin = userRepository.save(adminToUpdate);  // Guardar cambios
+            return toDto(updatedAdmin);  // Convertir a DTO y devolver
         } else {
-            throw new RuntimeException("Admin no encontrado con ID: " + admin.getId());
+            throw new RuntimeException("Admin no encontrado con ID: " + adminDto.getId());
         }
     }
 
-    // Eliminar un administrador (de manera lógica o física, según prefieras)
     @Override
-    public void deleteAdmin(Admin admin) {
-        Optional<User> existingUser = userRepository.findById(admin.getId());
+    public void deleteAdmin(AdminDto adminDto) {
+        // Buscar el admin por su ID en la base de datos
+        Optional<User> existingUser = userRepository.findById(adminDto.getId());
 
+        // Verifica que el usuario encontrado sea un Admin
         if (existingUser.isPresent() && existingUser.get() instanceof Admin) {
-            userRepository.delete(existingUser.get());  // Elimina el administrador de la base de datos
+            userRepository.delete(existingUser.get());
         } else {
-            throw new RuntimeException("Admin no encontrado con ID: " + admin.getId());
+            throw new RuntimeException("Admin no encontrado con ID: " + adminDto.getId());
         }
     }
 
-    // Obtener un administrador por su ID
     @Override
-    public Admin getAdminById(String adminId) {
+    public AdminDto getAdminById(String adminId) {
+        // Buscar el admin por su ID en la base de datos
         Optional<User> user = userRepository.findById(adminId);
         if (user.isPresent() && user.get() instanceof Admin) {
-            return (Admin) user.get();  // Hacer casting de User a Admin
+            return toDto((Admin) user.get());  // Hacemos casting a Admin y convertimos a DTO
         } else {
             throw new RuntimeException("Admin no encontrado con ID: " + adminId);
         }
     }
 
     @Override
-    public List<Admin> getAllAdmins() {
-        return List.of();
+    public List<AdminDto> getAllAdmins() {
+        // Filtrar solo los usuarios que son Admin y convertir a DTO
+        return userRepository.findAll().stream()
+                .filter(user -> user instanceof Admin)
+                .map(user -> toDto((Admin) user))
+                .collect(Collectors.toList());
     }
 
     // Crear un nuevo evento
@@ -125,7 +148,7 @@ public class AdminServiceImplementation implements iAdminService {
         return eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Evento no encontrado con ID: " + eventId));
     }
-    }
 
+}
 
 

@@ -6,9 +6,15 @@ import lombok.*;
 
 @Data
 @NoArgsConstructor
-@ToString
-@Builder
+@AllArgsConstructor
+@Getter
+@Setter
 public class AdminDto {
-
+    private String id;
+    private String name;
+    private String email;
+    private String address;
+    private String phone;
+    private String role;  // Podría ser ADMIN por defecto
 
 }

@@ -15,7 +15,6 @@ import java.util.List;
 @Document(collection = "users")  // Guardado en la misma colección que los usuarios
 public class Admin extends User{
 
-    List<Coupon> couponList = new ArrayList<>();
     List<Event> eventList = new ArrayList<>();
     // Aquí puedes agregar campos específicos de Admin, si existen.
     private String role = "ADMIN";  // Por ejemplo, un campo que defina el rol del admin

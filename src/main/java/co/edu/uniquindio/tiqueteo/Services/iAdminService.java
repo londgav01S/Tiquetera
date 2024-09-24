@@ -1,5 +1,6 @@
 package co.edu.uniquindio.tiqueteo.Services;
 
+import co.edu.uniquindio.tiqueteo.Dto.AdminDto;
 import co.edu.uniquindio.tiqueteo.Dto.EventDto;
 import co.edu.uniquindio.tiqueteo.Model.Admin;
 import co.edu.uniquindio.tiqueteo.Model.Event;
@@ -8,13 +9,12 @@ import java.util.List;
 
 public interface iAdminService {
 
-    // Operaciones CRUD para Administradores
-    Admin createAdmin(Admin admin);
-    Admin updateAdmin(Admin admin);
-    void deleteAdmin(Admin admin);
-    Admin getAdminById(String adminId);
-    List<Admin> getAllAdmins();
-
+    // Operaciones CRUD para Administradores usando AdminDto
+    AdminDto createAdmin(AdminDto adminDto);
+    AdminDto updateAdmin(AdminDto adminDto);
+    void deleteAdmin(AdminDto adminDto);
+    AdminDto getAdminById(String adminId);
+    List<AdminDto> getAllAdmins();
     // Crear un nuevo evento
     Event createEvent(Event event);
 
