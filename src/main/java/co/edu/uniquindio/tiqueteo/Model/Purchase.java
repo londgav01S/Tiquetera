@@ -4,7 +4,9 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
+import java.util.Date;
+
+@Document ("purchases")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,9 +17,12 @@ public class Purchase {
     @Id
     @EqualsAndHashCode.Include()
     String id;
-    String orderCode;
-    String userId;
-    Double total;
-    String date;
+
+    private String eventId;
+    private String clientId;
+    private Integer cant;
+    private Double totalPrice;
+    private Date date;
+    private boolean cancelled = false;  // Indica si la compra ha sido cancelada (por defecto false)
     PurchaseDetail detail;
 }

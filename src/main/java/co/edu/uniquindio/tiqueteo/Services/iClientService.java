@@ -1,21 +1,20 @@
 package co.edu.uniquindio.tiqueteo.Services;
 
+import co.edu.uniquindio.tiqueteo.Dto.ClientDto;
 import co.edu.uniquindio.tiqueteo.Dto.PurchaseDto;
-import co.edu.uniquindio.tiqueteo.Model.Admin;
-import co.edu.uniquindio.tiqueteo.Model.Client;
 import co.edu.uniquindio.tiqueteo.Model.Purchase;
 
 import java.util.List;
 
 public interface iClientService {
-     Client createClient (Client client);
-     Client updateClient(Client client);
-     void deleteClient(Client client);
-     Client getClientById(String clientId);
-     List<Client> getAllClient();
+     ClientDto createClient (ClientDto clientDto);
+     ClientDto updateClient(ClientDto clientDto);
+     void deleteClient(ClientDto clientDto);
+     ClientDto getClientById(String clientId);
+     List<ClientDto> getAllClient();
 
-     Purchase buyTicket(PurchaseDto purchase);
-     Purchase cancelTicket(PurchaseDto purchase);
-     Purchase getTicketById(int id);
-     Purchase getAllTicketsByClient(int clientId);
+     PurchaseDto buyTicket(PurchaseDto purchaseDto);
+     PurchaseDto cancelTicket(PurchaseDto purchaseDto);
+     PurchaseDto getTicketById(String id);
+     List getAllTicketsByClient(String clientId);
 }

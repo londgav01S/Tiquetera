@@ -1,7 +1,7 @@
 package co.edu.uniquindio.tiqueteo.Controller;
 
-import co.edu.uniquindio.tiqueteo.Dto.AdminDto;
-import co.edu.uniquindio.tiqueteo.Model.Admin;
+import co.edu.uniquindio.tiqueteo.Dto.EventDto;
+import co.edu.uniquindio.tiqueteo.Dto.UserDto;
 import co.edu.uniquindio.tiqueteo.Services.iAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,33 +16,67 @@ public class AdminViewController {
     private iAdminService adminService;
 
     // Crear un nuevo admin: POST /api/admin
-    @PostMapping
-    public AdminDto create(@RequestBody AdminDto adminDto) {
-        return adminService.createAdmin(adminDto);
+    @PostMapping("/createAdmin")
+    public UserDto create(@RequestBody UserDto userDto) {
+        return adminService.createAdmin(userDto);
     }
 
     // Actualizar un admin: PUT /api/admin
-    @PutMapping
-    public AdminDto update(@RequestBody AdminDto adminDto) {
-        return adminService.updateAdmin(adminDto);
+    @PutMapping("/updateAdmin")
+    public UserDto update(@RequestBody UserDto userDto) {
+        return adminService.updateAdmin(userDto);
     }
 
     // Eliminar un admin por ID: DELETE /api/admin/{id}
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}/deleteAdmin")
     public void delete(@PathVariable String id) {
-        AdminDto adminDelete = adminService.getAdminById(id);
+        UserDto adminDelete = adminService.getAdminById(id);
         adminService.deleteAdmin(adminDelete);
     }
 
     // Obtener un admin por ID: GET /api/admin/{id}
-    @GetMapping("/{id}")
-    public AdminDto getAdminById(@PathVariable String id) {
+    @GetMapping("/{id}/getAdmin")
+    public UserDto getAdminById(@PathVariable String id) {
         return adminService.getAdminById(id);
     }
 
     // Obtener todos los admins: GET /api/admin/all
-    @GetMapping("/all")
-    public List<AdminDto> getAllAdmins() {
+    @GetMapping("/allAdmins")
+    public List<UserDto> getAllAdmins() {
         return adminService.getAllAdmins();
     }
+
+    //////////////////////////////////////////
+    // Crear un nuevo evento
+    @PostMapping("/createEvent")
+    public EventDto create(@RequestBody EventDto eventDto) {
+        return adminService.createEvent(eventDto);
+    }
+
+    // Actualizar un evento
+    @PutMapping("/updateEvent")
+    public EventDto updateEvent(@RequestBody EventDto eventDto) {
+        return adminService.updateEvent(eventDto);
+    }
+
+    // Eliminar un evento por ID
+    @DeleteMapping("/{id}/deleteEvent")
+    public void deleteEvent(@PathVariable String id) {
+        EventDto eventDelete = adminService.getEventById(id);
+        adminService.deleteEvent(eventDelete);
+    }
+
+    // Obtener un evento por ID
+    @GetMapping("/{id}/getEvent")
+    public EventDto getEventById(@PathVariable String id) {
+        return adminService.getEventById(id);
+    }
+
+    // Obtener todos los eventos
+    @GetMapping("/allEvents")
+    public List<EventDto> getAllEvents() {
+        return adminService.getAllEvents();
+    }
+
+
 }
