@@ -1,6 +1,7 @@
 package co.edu.uniquindio.tiqueteo.Controller;
 
 import co.edu.uniquindio.tiqueteo.Dto.ClientDto;
+import co.edu.uniquindio.tiqueteo.Dto.LoginDto;
 import co.edu.uniquindio.tiqueteo.Dto.PurchaseDto;
 import co.edu.uniquindio.tiqueteo.Dto.UserDto;
 import co.edu.uniquindio.tiqueteo.Model.Admin;
@@ -9,6 +10,8 @@ import co.edu.uniquindio.tiqueteo.Model.Purchase;
 import co.edu.uniquindio.tiqueteo.Services.iAdminService;
 import co.edu.uniquindio.tiqueteo.Services.iClientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,33 +22,43 @@ public class ClientViewController {
     @Autowired
     private iClientService clientService;
 
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
+        boolean loginSuccess = clientService.login(loginDto);
+        if (loginSuccess) {
+            return ResponseEntity.ok("Inicio de sesión exitoso");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
+        }
+    }
+
     // Crear un nuevo admin: POST /api/admin
-    @PostMapping ("/createClient")
-    public ClientDto create(@RequestBody ClientDto clientDto) {
+    @PostMapping ("/register")
+    public UserDto create(@RequestBody UserDto clientDto) {
         return clientService.createClient(clientDto);
     }
 
     // Actualizar un admin: PUT /api/admin
     @PutMapping("/updateClient")
-    public ClientDto update(@RequestBody ClientDto clientDto) {
+    public UserDto update(@RequestBody UserDto clientDto) {
         return clientService.updateClient(clientDto);
     }
 
     // Eliminar un admin por ID: DELETE /api/admin/{id}
     @DeleteMapping("/{id}/client")
     public void delete(@PathVariable String id) {
-        ClientDto clientDelete = clientService.getClientById(id);
+        UserDto clientDelete = clientService.getClientById(id);
         clientService.deleteClient(clientDelete);
     }
 
     // Obtener un admin por ID: GET /api/admin/{id}
     @GetMapping("/{id}/client")
-    public ClientDto getClientById(@PathVariable String id) {
+    public UserDto getClientById(@PathVariable String id) {
         return clientService.getClientById(id);
     }
     // Obtener todos los admins: GET /api/admin/all
     @GetMapping("/allClients")
-    public List<ClientDto> getAllClient() {
+    public List<UserDto> getAllClient() {
         return clientService.getAllClient();
     }
 

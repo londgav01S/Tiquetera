@@ -22,10 +22,8 @@ public class Event {
     String name;
     String address;
     String description;
-    Double ticketPrice;
     EventType type;
     String image;
-    String location;
     LocalDate eventDate;
 
     List<Locality> localities;

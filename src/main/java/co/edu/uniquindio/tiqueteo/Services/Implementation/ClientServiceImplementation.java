@@ -1,7 +1,9 @@
 package co.edu.uniquindio.tiqueteo.Services.Implementation;
 
 import co.edu.uniquindio.tiqueteo.Dto.ClientDto;
+import co.edu.uniquindio.tiqueteo.Dto.LoginDto;
 import co.edu.uniquindio.tiqueteo.Dto.PurchaseDto;
+import co.edu.uniquindio.tiqueteo.Dto.UserDto;
 import co.edu.uniquindio.tiqueteo.Model.*;
 import co.edu.uniquindio.tiqueteo.Repositories.EventRepository;
 import co.edu.uniquindio.tiqueteo.Repositories.PurchaseRepository;
@@ -10,6 +12,7 @@ import co.edu.uniquindio.tiqueteo.Services.iClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,31 +28,47 @@ public class ClientServiceImplementation implements iClientService {
     @Autowired
     private PurchaseRepository purchaseRepository;
 
+
+    @Override
+    public boolean login(LoginDto loginDto) {
+        // Buscar el cliente por email
+        Client client = userRepository.findByEmail(loginDto.getEmail());
+
+        if (client != null) {
+            // Verificar la contraseña directamente (sin BCrypt)
+            if (loginDto.getPassword().equals(client.getPassword())) {
+                return true;  // Inicio de sesión exitoso
+            }
+        }
+        return false;  // Credenciales incorrectas
+    }
     // Convertir AdminDto a Admin (convierte de DTO a entidad)
-    private Client toEntity(ClientDto clientDto) {
+    private Client toEntity(UserDto clientDto) {
         Client client = new Client();
         client.setId(clientDto.getId());
         client.setName(clientDto.getName());
         client.setEmail(clientDto.getEmail());
         client.setAddress(clientDto.getAddress());
         client.setPhone(clientDto.getPhone());
+        client.setPassword(clientDto.getPassword());
         return client;
     }
 
     // Convertir Admin a AdminDto (convierte de entidad a DTO)
-    private ClientDto toDto(Client client) {
-        return new ClientDto(client.getId(), client.getName(), client.getEmail(), client.getAddress(), client.getPhone());
+    private UserDto toDto(Client client) {
+        return new UserDto(client.getId(), client.getName(), client.getEmail(), client.getAddress(), client.getPhone(), client.getPassword(), "CLIENT");
     }
 
     @Override
-    public ClientDto createClient(ClientDto clientDto) {
+    public UserDto createClient(UserDto clientDto) {
         Client client = toEntity(clientDto);  // Convierte DTO a entidad
         Client savedClient = userRepository.save(client);  // Guarda el admin en MongoDB
         return toDto(savedClient);  // Convierte entidad a DTO y devuelve
+
     }
 
     @Override
-    public ClientDto updateClient(ClientDto clientDto) {
+    public UserDto updateClient(UserDto clientDto) {
         // Buscar el admin por su ID en la base de datos
         Optional<User> existingUser = userRepository.findById(clientDto.getId());
 
@@ -69,7 +88,7 @@ public class ClientServiceImplementation implements iClientService {
     }
 
     @Override
-    public void deleteClient(ClientDto clientDto) {
+    public void deleteClient(UserDto clientDto) {
         // Buscar el admin por su ID en la base de datos
         Optional<User> existingUser = userRepository.findById(clientDto.getId());
 
@@ -82,7 +101,7 @@ public class ClientServiceImplementation implements iClientService {
     }
 
     @Override
-    public ClientDto getClientById(String clientId) {
+    public UserDto getClientById(String clientId) {
         // Buscar el admin por su ID en la base de datos
         Optional<User> user = userRepository.findById(clientId);
         if (user.isPresent() && user.get() instanceof Client) {
@@ -93,7 +112,7 @@ public class ClientServiceImplementation implements iClientService {
     }
 
     @Override
-    public List<ClientDto> getAllClient() {
+    public List<UserDto> getAllClient() {
         // Filtrar solo los usuarios que son Admin y convertir a DTO
         return userRepository.findAll().stream()
                 .filter(user -> user instanceof Client)
@@ -116,7 +135,7 @@ public class ClientServiceImplementation implements iClientService {
 
     // Convertir Admin a AdminDto (convierte de entidad a DTO)
     private PurchaseDto toDto(Purchase purchase) {
-        return new PurchaseDto(purchase.getId(), purchase.getEventId(), purchase.getClientId(), purchase.getCant(), purchase.getTotalPrice(), purchase.getDate(), purchase.isCancelled());
+        return new PurchaseDto(purchase.getId(), purchase.getEventId(), purchase.getClientId(), purchase.getCant(), purchase.getTotalPrice(), purchase.getDate(), purchase.getLocalityId(), purchase.isCancelled());
     }
     @Override
     public PurchaseDto buyTicket(PurchaseDto purchaseDto) {
@@ -125,8 +144,22 @@ public class ClientServiceImplementation implements iClientService {
         Event event = eventRepository.findById(purchaseDto.getEventId())
                 .orElseThrow(() -> new RuntimeException("Evento no encontrado con ID: " + purchaseDto.getEventId()));
 
-        // Calcular el precio total (cantidad de tickets * precio por ticket)
-        double totalPrice = purchaseDto.getCant() * event.getTicketPrice();
+        // Buscar la localidad seleccionada dentro del evento
+        Locality selectedLocality = event.getLocalities().stream()
+                .filter(locality -> locality.getId().equals(purchaseDto.getLocalityId()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Localidad no encontrada con ID: " + purchaseDto.getLocalityId()));
+
+        // Validar si hay suficientes entradas disponibles en la localidad seleccionada
+        if (selectedLocality.getCurrentCapacity() + purchaseDto.getCant() > selectedLocality.getMaxCapacity()) {
+            throw new RuntimeException("No hay suficientes entradas disponibles en la localidad seleccionada.");
+        }
+
+        // Calcular el precio total (cantidad de tickets * precio de la localidad)
+        double totalPrice = purchaseDto.getCant() * selectedLocality.getPrice();
+
+        // Actualizar la capacidad actual de la localidad
+        selectedLocality.setCurrentCapacity(selectedLocality.getCurrentCapacity() + purchaseDto.getCant());
 
         // Convertir PurchaseDto a Purchase (entidad)
         Purchase purchase = new Purchase();
@@ -134,11 +167,14 @@ public class ClientServiceImplementation implements iClientService {
         purchase.setClientId(purchaseDto.getClientId());
         purchase.setCant(purchaseDto.getCant());
         purchase.setTotalPrice(totalPrice);
-        purchase.setDate(purchaseDto.getDate());
+        purchase.setDate(LocalDateTime.now());
+        purchase.setLocalityId(selectedLocality.getName());  // Guardar el nombre de la localidad en la compra
 
         // Guardar la compra en la base de datos
         Purchase savedPurchase = purchaseRepository.save(purchase);
 
+        // Actualizar la lista de localidades del evento y guardar el evento
+        eventRepository.save(event);
         // Convertir Purchase (entidad) a PurchaseDto y devolver al frontend
         return toDto(savedPurchase);
     }

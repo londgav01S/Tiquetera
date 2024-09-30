@@ -1,17 +1,20 @@
 package co.edu.uniquindio.tiqueteo.Services.Implementation;
 
 import co.edu.uniquindio.tiqueteo.Dto.EventDto;
+import co.edu.uniquindio.tiqueteo.Dto.RangeDateDto;
+import co.edu.uniquindio.tiqueteo.Dto.ReportDto;
 import co.edu.uniquindio.tiqueteo.Dto.UserDto;
-import co.edu.uniquindio.tiqueteo.Model.Admin;
-import co.edu.uniquindio.tiqueteo.Model.Client;
-import co.edu.uniquindio.tiqueteo.Model.Event;
-import co.edu.uniquindio.tiqueteo.Model.User;
+import co.edu.uniquindio.tiqueteo.Model.*;
 import co.edu.uniquindio.tiqueteo.Repositories.EventRepository;
+import co.edu.uniquindio.tiqueteo.Repositories.PurchaseRepository;
 import co.edu.uniquindio.tiqueteo.Repositories.UserRepository;
 import co.edu.uniquindio.tiqueteo.Services.iAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -19,10 +22,73 @@ import java.util.stream.Collectors;
 public class AdminServiceImplementation implements iAdminService {
 
     @Autowired
+    private PurchaseRepository purchaseRepository;
+
+    @Autowired
     private EventRepository eventRepository;  // Repositorio basado en MongoDB
 
     @Autowired
     private UserRepository userRepository;
+
+    @Override
+    public ReportDto generateReport(RangeDateDto rangeDateDto) {
+        // Extraer las compras realizadas dentro del intervalo de tiempo seleccionado
+        List<Purchase> purchases = purchaseRepository.findAllByDateBetween(rangeDateDto.getStartDate(), rangeDateDto.getEndDate());
+
+        // Agrupar compras por evento
+        Map<String, List<Purchase>> purchasesByEvent = purchases.stream()
+                .collect(Collectors.groupingBy(Purchase::getEventId));
+
+        // Variables para acumular el total de ventas y boletos vendidos
+        double totalSales = 0;
+        int totalTicketsSold = 0;
+
+        // Reporte que se devolverá
+        ReportDto report = new ReportDto();
+
+        // Recorrer cada evento y calcular las estadísticas
+        for (Map.Entry<String, List<Purchase>> entry : purchasesByEvent.entrySet()) {
+            String eventId = entry.getKey();
+            List<Purchase> eventPurchases = entry.getValue();
+
+            // Buscar el evento en la base de datos
+            Event event = eventRepository.findById(eventId)
+                    .orElseThrow(() -> new RuntimeException("Evento no encontrado con ID: " + eventId));
+
+            // Calcular ventas y boletos vendidos para el evento
+            double eventTotalSales = eventPurchases.stream().mapToDouble(Purchase::getTotalPrice).sum();
+            int eventTotalTickets = eventPurchases.stream().mapToInt(Purchase::getCant).sum();
+
+            totalSales += eventTotalSales;
+            totalTicketsSold += eventTotalTickets;
+
+            // Calcular porcentaje de ocupación por localidad
+            Map<String, Double> occupancyByLocality = calculateOccupancy(event, eventPurchases);
+
+            // Agregar la información del evento al reporte
+            report.addEventData(event, eventTotalSales, eventTotalTickets, occupancyByLocality);
+        }
+
+        // Asignar valores totales al reporte
+        report.setTotalSales(totalSales);
+        report.setTotalTicketsSold(totalTicketsSold);
+
+        return report;
+    }
+
+    // Método auxiliar para calcular el porcentaje de ocupación por localidad
+    private Map<String, Double> calculateOccupancy(Event event, List<Purchase> eventPurchases) {
+        Map<String, Integer> ticketsSoldByLocality = eventPurchases.stream()
+                .collect(Collectors.groupingBy(Purchase::getLocalityId, Collectors.summingInt(Purchase::getCant)));
+
+        return event.getLocalities().stream().collect(Collectors.toMap(
+                Locality::getName,
+                locality -> {
+                    int ticketsSold = ticketsSoldByLocality.getOrDefault(locality.getName(), 0);
+                    return ((double) ticketsSold / locality.getMaxCapacity()) * 100;
+                }
+        ));
+    }
 
     // Convertir AdminDto a Admin (convierte de DTO a entidad)
     private Admin toEntity(UserDto userDto) {
@@ -38,7 +104,7 @@ public class AdminServiceImplementation implements iAdminService {
 
     // Convertir Admin a AdminDto (convierte de entidad a DTO)
     private UserDto toDto(Admin admin) {
-        return new UserDto(admin.getId(), admin.getName(), admin.getEmail(), admin.getAddress(), admin.getPhone(), admin.getRole());
+        return new UserDto(admin.getId(), admin.getName(), admin.getEmail(), admin.getAddress(), admin.getPhone(), admin.getPassword(), admin.getRole());
     }
 
     @Override
@@ -107,14 +173,14 @@ public class AdminServiceImplementation implements iAdminService {
         event.setId(eventDto.getId());
         event.setName(eventDto.getName());
         event.setAddress(eventDto.getAddress());
-        event.setTicketPrice(eventDto.getTicketPrice());
-        event.setLocation(eventDto.getLocation());
+        event.setEventDate(eventDto.getEventDate());
+        event.setLocalities(eventDto.getLocalities());
         return event;
     }
 
     // Convertir Admin a AdminDto (convierte de entidad a DTO)
     private EventDto toDto(Event event) {
-        return new EventDto(event.getId(), event.getName(), event.getAddress(), event.getTicketPrice(), event.getLocation());
+        return new EventDto(event.getId(), event.getName(), event.getAddress(), event.getEventDate(), event.getLocalities());
     }
 
     @Override
@@ -136,7 +202,6 @@ public class AdminServiceImplementation implements iAdminService {
             // Actualizar los campos necesarios
             eventToUpdate.setName(eventDto.getName());
             eventToUpdate.setAddress(eventDto.getAddress());
-            eventToUpdate.setTicketPrice(eventDto.getTicketPrice());
             Event updatedEvent = eventRepository.save(eventToUpdate);  // Guardar cambios
             return toDto(updatedEvent);  // Convertir a DTO y devolver
         } else {

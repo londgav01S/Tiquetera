@@ -1,22 +1,37 @@
 package co.edu.uniquindio.tiqueteo.Controller;
 
 import co.edu.uniquindio.tiqueteo.Dto.EventDto;
+import co.edu.uniquindio.tiqueteo.Dto.RangeDateDto;
+import co.edu.uniquindio.tiqueteo.Dto.ReportDto;
 import co.edu.uniquindio.tiqueteo.Dto.UserDto;
 import co.edu.uniquindio.tiqueteo.Services.iAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")  // Ruta base para Admin
+
 public class AdminViewController {
 
     @Autowired
     private iAdminService adminService;
 
-    // Crear un nuevo admin: POST /api/admin
-    @PostMapping("/createAdmin")
+
+    @GetMapping("/report")
+    public ReportDto generateReport(@RequestBody RangeDateDto rangeDateDto) {
+        LocalDate startDate = rangeDateDto.getStartDate();
+        LocalDate endDate = rangeDateDto.getEndDate();
+        // Lógica para generar reportes usando startDate y endDate
+        return adminService.generateReport(rangeDateDto);
+    }
+
+        // Crear un nuevo admin: POST /api/admin
+    @PostMapping("/register")
     public UserDto create(@RequestBody UserDto userDto) {
         return adminService.createAdmin(userDto);
     }
