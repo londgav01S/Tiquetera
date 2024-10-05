@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
 @Service
 public class EmailServiceImplementation implements IEmailService {
@@ -12,12 +13,18 @@ public class EmailServiceImplementation implements IEmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void sendEmail(String toEmail, String subject, String body) {
+    @Value("${email.registration.subject}")
+    private String emailSubject;
+
+    @Value("${email.registration.body}")
+    private String emailBody;
+
+    public void sendEmail(String toEmail) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("tiqueteo@gmail.com");
         message.setTo(toEmail);
-        message.setSubject(subject);
-        message.setText(body);
+        message.setSubject(emailSubject);
+        message.setText(emailBody);
         mailSender.send(message);
     }
 }
