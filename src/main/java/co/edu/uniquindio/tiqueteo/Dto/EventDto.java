@@ -1,22 +1,23 @@
 package co.edu.uniquindio.tiqueteo.Dto;
 
-import co.edu.uniquindio.tiqueteo.Model.Enums.EventType;
 import co.edu.uniquindio.tiqueteo.Model.Locality;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
 
-public record EventDto(
-        String id,
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+public class EventDto {
 
-        String name,
-        String address,
-        String description,
-        EventType type,
-        String image,
-        LocalDate location,
-        String date,
-
-        List<Locality>localities
-) {
+    String id;
+    String name;
+    String address;
+    LocalDate eventDate;
+    List<Locality> localities;
 }

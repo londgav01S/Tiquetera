@@ -1,15 +1,19 @@
 package co.edu.uniquindio.tiqueteo.Dto;
 
-import lombok.EqualsAndHashCode;
-import org.springframework.data.annotation.Id;
+import lombok.*;
 
-public record UserDto(
-        String name,
-        String email,
-        String password,
-        String address,
-        String phone,
-        String idUser,
-        String id
-) {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class UserDto {
+    private String id;
+    private String name;
+    private String email;
+    private String address;
+    private String phone;
+    private String password;
+    private String role;  // Podría ser ADMIN por defecto
+
 }
