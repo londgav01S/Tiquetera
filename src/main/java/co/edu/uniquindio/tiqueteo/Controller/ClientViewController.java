@@ -18,11 +18,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/client")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ClientViewController {
     @Autowired
     private iClientService clientService;
 
     @PostMapping("/login")
+    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
         boolean loginSuccess = clientService.login(loginDto);
         if (loginSuccess) {
