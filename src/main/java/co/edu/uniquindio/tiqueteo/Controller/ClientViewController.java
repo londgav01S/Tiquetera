@@ -4,10 +4,6 @@ import co.edu.uniquindio.tiqueteo.Dto.ClientDto;
 import co.edu.uniquindio.tiqueteo.Dto.LoginDto;
 import co.edu.uniquindio.tiqueteo.Dto.PurchaseDto;
 import co.edu.uniquindio.tiqueteo.Dto.UserDto;
-import co.edu.uniquindio.tiqueteo.Model.Admin;
-import co.edu.uniquindio.tiqueteo.Model.Client;
-import co.edu.uniquindio.tiqueteo.Model.Purchase;
-import co.edu.uniquindio.tiqueteo.Services.iAdminService;
 import co.edu.uniquindio.tiqueteo.Services.iClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,12 +16,17 @@ import java.util.List;
 @RequestMapping("/api/client")
 @CrossOrigin(origins = "http://localhost:3000")
 public class ClientViewController {
+
+    private final iClientService clientService;
+
     @Autowired
-    private iClientService clientService;
+    public ClientViewController(iClientService clientService) {
+        this.clientService = clientService;
+    }
 
     @PostMapping("/login")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
+        System.out.println("Entrando a login");
         boolean loginSuccess = clientService.login(loginDto);
         if (loginSuccess) {
             return ResponseEntity.ok("Inicio de sesión exitoso");
