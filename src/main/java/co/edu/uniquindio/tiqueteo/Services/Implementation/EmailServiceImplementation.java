@@ -19,12 +19,27 @@ public class EmailServiceImplementation implements IEmailService {
     @Value("${email.registration.body}")
     private String emailBody;
 
+    @Value("${email.purchase.subject}")
+    private String purchaseSubject;
+
+    @Value("${email.purchase.body}")
+    private String purchaseBody;
+
     public void sendEmail(String toEmail) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("tiqueteo@gmail.com");
         message.setTo(toEmail);
         message.setSubject(emailSubject);
         message.setText(emailBody);
+        mailSender.send(message);
+    }
+
+    public void sendPurchaseEmail(String toEmail) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("tiqueteo@gmail.com");
+        message.setTo(toEmail);
+        message.setSubject(purchaseSubject);
+        message.setText(purchaseBody);
         mailSender.send(message);
     }
 }

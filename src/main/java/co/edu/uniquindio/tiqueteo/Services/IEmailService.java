@@ -1,5 +1,6 @@
 package co.edu.uniquindio.tiqueteo.Services;
 
 public interface IEmailService {
-    public void sendEmail(String toEmail);
+    void sendEmail(String toEmail);
+    void sendPurchaseEmail(String toEmail);
 }

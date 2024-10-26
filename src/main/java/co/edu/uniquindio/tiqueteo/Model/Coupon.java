@@ -15,11 +15,9 @@ public class Coupon {
 
     @Id @EqualsAndHashCode.Include
     String id;
-
     String code;
     String name;
     Double percentage;
     String date;
-
 
 }
