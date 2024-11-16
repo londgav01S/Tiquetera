@@ -39,6 +39,7 @@ public class PurchaseServiceImplementation implements iPurchaseService {
                     + ", Cantidad: " + purchase.getCant() + ", Precio Total: " + purchase.getTotalPrice();
             BitMatrix bitMatrix = qrCodeWriter.encode(qrContent, BarcodeFormat.QR_CODE, 300, 300);
 
+            //TODO: guardar qr en firebase.
             String qrPath = "qr_codes/" + purchase.getId() + ".png";
             Path path = FileSystems.getDefault().getPath(qrPath);
             MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
