@@ -19,7 +19,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeRequests(authorize -> authorize
-                .requestMatchers("/api/client/login", "/login").permitAll() // Permitir acceso a login y la raíz
+                .requestMatchers("/api/client/login", "/login", "/api/client/registerUser", "/registerUser").permitAll() // Permitir acceso a login y la raíz
                 .anyRequest().authenticated() // Otras rutas requieren autenticación
             )
             .formLogin(form -> form
