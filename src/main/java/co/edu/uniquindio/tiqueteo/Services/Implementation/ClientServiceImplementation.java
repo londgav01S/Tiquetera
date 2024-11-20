@@ -73,7 +73,7 @@ public class ClientServiceImplementation implements iClientService {
     public UserDto createClient(UserDto clientDto) {
         Client client = toEntity(clientDto);  // Convierte DTO a entidad
         Client savedClient = userRepository.save(client);  // Guarda el admin en MongoDB
-        //emailService.sendEmail(client.getEmail());  // Enviar correo de confirmación
+        emailService.sendEmail(client.getEmail());  // Enviar correo de confirmación
         return toDto(savedClient);  // Convierte entidad a DTO y devuelve
 
     }
