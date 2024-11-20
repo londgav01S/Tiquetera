@@ -25,22 +25,25 @@ public class EmailServiceImplementation implements IEmailService {
     @Value("${email.purchase.body}")
     private String purchaseBody;
 
+    @Override
     public void sendEmail(String toEmail) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("tiqueteo@gmail.com");
+        message.setFrom("no-reply@tiqueteo.com"); // Cambia el remitente si es necesario
         message.setTo(toEmail);
         message.setSubject(emailSubject);
         message.setText(emailBody);
         mailSender.send(message);
     }
 
+    @Override
     public void sendPurchaseEmail(String toEmail) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("tiqueteo@gmail.com");
+        message.setFrom("no-reply@tiqueteo.com");
         message.setTo(toEmail);
         message.setSubject(purchaseSubject);
         message.setText(purchaseBody);
         mailSender.send(message);
     }
 }
+
 
