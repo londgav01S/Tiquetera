@@ -1,6 +1,8 @@
 package co.edu.uniquindio.tiqueteo.Services;
 
+import java.io.File;
+
 public interface IEmailService {
     void sendEmail(String toEmail);
-    void sendPurchaseEmail(String toEmail);
+    void sendPurchaseEmail(String toEmail, File qrFile);
 }
