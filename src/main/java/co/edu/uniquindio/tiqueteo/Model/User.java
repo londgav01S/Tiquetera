@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+
 @Document("users")
 @Data
 @AllArgsConstructor
@@ -22,5 +24,6 @@ public abstract class User {
     @Id @EqualsAndHashCode.Include
     String id;
 
-
+    String recoveryCode; // Clave de recuperación
+    LocalDateTime recoveryCodeExpiration; // Fecha de expiración de la clave
 }

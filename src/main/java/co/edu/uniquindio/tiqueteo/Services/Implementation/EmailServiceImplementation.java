@@ -41,6 +41,16 @@ public class EmailServiceImplementation implements IEmailService {
     }
 
     @Override
+    public void sendEmailWithBody(String toEmail, String subject, String body) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("no-reply@tiqueteo.com");
+        message.setTo(toEmail);
+        message.setSubject(subject);
+        message.setText(body);
+        mailSender.send(message);
+    }
+
+    @Override
     public void sendPurchaseEmail(String toEmail, File qrFile) {
         try {
             MimeMessage message = mailSender.createMimeMessage();

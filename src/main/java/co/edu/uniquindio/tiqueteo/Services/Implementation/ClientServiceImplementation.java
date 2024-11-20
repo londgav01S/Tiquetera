@@ -8,6 +8,7 @@ import co.edu.uniquindio.tiqueteo.Model.*;
 import co.edu.uniquindio.tiqueteo.Repositories.EventRepository;
 import co.edu.uniquindio.tiqueteo.Repositories.PurchaseRepository;
 import co.edu.uniquindio.tiqueteo.Repositories.UserRepository;
+import co.edu.uniquindio.tiqueteo.Services.IEmailService;
 import co.edu.uniquindio.tiqueteo.Services.iClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,12 +24,49 @@ public class ClientServiceImplementation implements iClientService {
 
     @Autowired
     private EventRepository eventRepository;  // Repositorio basado en MongoDB
-
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private PurchaseRepository purchaseRepository;
+    @Autowired
+    private IEmailService emailService;
 
+    public void generateRecoveryCode(String email) {
+        // Buscar al usuario por correo
+        Client client = userRepository.findByEmail(email);
+        if (client == null) {
+            throw new RuntimeException("Usuario no encontrado con este correo");
+        }
+
+        // Generar clave de 4 dígitos
+        String recoveryCode = String.format("%04d", new Random().nextInt(10000));
+        LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(15);
+
+        // Actualizar la clave y su expiración en el usuario
+        client.setRecoveryCode(recoveryCode);
+        client.setRecoveryCodeExpiration(expirationTime);
+        userRepository.save(client);
+
+        // Enviar correo con la clave
+        String emailBody = "Tu código de recuperación es: " + recoveryCode + ". Este código es válido por 15 minutos.";
+        emailService.sendEmailWithBody(client.getEmail(), "Código de Recuperación", emailBody);
+    }
+
+    public boolean validateRecoveryCode(String email, String code) {
+        // Buscar al usuario por correo
+        Client client = userRepository.findByEmail(email);
+        if (client == null) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+
+        // Validar la clave y su tiempo de expiración
+        if (client.getRecoveryCode() != null &&
+                client.getRecoveryCode().equals(code) &&
+                client.getRecoveryCodeExpiration().isAfter(LocalDateTime.now())) {
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public boolean login(LoginDto loginDto) {
