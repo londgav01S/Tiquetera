@@ -28,20 +28,30 @@ public class ClientServiceImplementation implements iClientService {
     @Autowired
     private PurchaseRepository purchaseRepository;
 
+    @Autowired
+    private EmailServiceImplementation emailService; ;
+
 
     @Override
-    public boolean login(LoginDto loginDto) {
-        // Buscar el cliente por email
-        Client client = userRepository.findByEmail(loginDto.getEmail());
+    public Client login(LoginDto loginDto) {
 
-        if (client != null) {
+        String email = loginDto.getEmail().toLowerCase();
+        System.out.println(email);
+        // Buscar el cliente por email
+        User user = userRepository.findByEmail(email);
+
+        // Verificar si el usuario existe y es de tipo Client
+        if (user != null && user instanceof Client) {
+            Client client = (Client) user;
+
             // Verificar la contraseña directamente (sin BCrypt)
             if (loginDto.getPassword().equals(client.getPassword())) {
-                return true;  // Inicio de sesión exitoso
+                return client;  // Retornar el cliente si el inicio de sesión es exitoso
             }
         }
-        return false;  // Credenciales incorrectas
-    }
+
+        throw new RuntimeException("Credenciales incorrectas");  // Lanza una excepción si las credenciales son incorrectas
+}
     // Convertir AdminDto a Admin (convierte de DTO a entidad)
     private Client toEntity(UserDto clientDto) {
         Client client = new Client();
@@ -63,11 +73,12 @@ public class ClientServiceImplementation implements iClientService {
     public UserDto createClient(UserDto clientDto) {
         Client client = toEntity(clientDto);  // Convierte DTO a entidad
         Client savedClient = userRepository.save(client);  // Guarda el admin en MongoDB
+        //emailService.sendEmail(client.getEmail());  // Enviar correo de confirmación
         return toDto(savedClient);  // Convierte entidad a DTO y devuelve
 
     }
 
-    @Override
+/*    @Override
     public UserDto updateClient(UserDto clientDto) {
         // Buscar el admin por su ID en la base de datos
         Optional<User> existingUser = userRepository.findById(clientDto.getId());
@@ -84,6 +95,27 @@ public class ClientServiceImplementation implements iClientService {
             return toDto(updatedClient);  // Convertir a DTO y devolver
         } else {
             throw new RuntimeException("Admin no encontrado con ID: " + clientDto.getId());
+        }
+    }*/
+
+    @Override
+    public UserDto updateClient(UserDto clientDto) {
+    // Buscar el cliente por su ID en la base de datos
+        Optional<User> existingUser = userRepository.findById(clientDto.getId());
+
+        // Verifica que el usuario encontrado sea un Client
+        if (existingUser.isPresent() && existingUser.get() instanceof Client) {
+            Client clientToUpdate = (Client) existingUser.get();  // Hacemos casting a Client
+            // Actualizar los campos necesarios
+            clientToUpdate.setName(clientDto.getName());
+            clientToUpdate.setEmail(clientDto.getEmail());
+            clientToUpdate.setAddress(clientDto.getAddress());
+            clientToUpdate.setPhone(clientDto.getPhone());
+            clientToUpdate.setPassword(clientDto.getPassword()); // Asegúrate de actualizar la contraseña
+            Client updatedClient = userRepository.save(clientToUpdate);  // Guardar cambios
+            return toDto(updatedClient);  // Convertir a DTO y devolver
+        } else {
+            throw new RuntimeException("Client no encontrado con ID: " + clientDto.getId());
         }
     }
 

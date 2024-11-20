@@ -2,7 +2,9 @@ package co.edu.uniquindio.tiqueteo.Controller;
 
 import co.edu.uniquindio.tiqueteo.Model.Client;
 import co.edu.uniquindio.tiqueteo.Repositories.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.io.IOException;
 
 @Controller
 @RequestMapping("/api/logear")
@@ -51,5 +55,6 @@ public class LoginController {
         }
         return ResponseEntity.badRequest().body("Ñao ñao");
     }
+
 
 }

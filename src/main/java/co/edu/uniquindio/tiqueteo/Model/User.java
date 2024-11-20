@@ -22,5 +22,4 @@ public abstract class User {
     @Id @EqualsAndHashCode.Include
     String id;
 
-
 }
