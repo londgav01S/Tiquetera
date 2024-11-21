@@ -19,6 +19,7 @@ public abstract class User {
     String password;
     String address;
     String phone;
+    String image;
 
 
     @Id @EqualsAndHashCode.Include

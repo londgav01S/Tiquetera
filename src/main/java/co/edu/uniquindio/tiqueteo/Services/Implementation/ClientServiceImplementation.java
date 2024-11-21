@@ -8,6 +8,7 @@ import co.edu.uniquindio.tiqueteo.Model.*;
 import co.edu.uniquindio.tiqueteo.Repositories.EventRepository;
 import co.edu.uniquindio.tiqueteo.Repositories.PurchaseRepository;
 import co.edu.uniquindio.tiqueteo.Repositories.UserRepository;
+import co.edu.uniquindio.tiqueteo.Services.IEmailService;
 import co.edu.uniquindio.tiqueteo.Services.iClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,14 +24,12 @@ public class ClientServiceImplementation implements iClientService {
 
     @Autowired
     private EventRepository eventRepository;  // Repositorio basado en MongoDB
-
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private PurchaseRepository purchaseRepository;
-
     @Autowired
-    private EmailServiceImplementation emailService; ;
+    private IEmailService emailService;
 
 
     @Override
@@ -61,12 +61,14 @@ public class ClientServiceImplementation implements iClientService {
         client.setAddress(clientDto.getAddress());
         client.setPhone(clientDto.getPhone());
         client.setPassword(clientDto.getPassword());
+        client.setImage(clientDto.getImage());
         return client;
     }
 
     // Convertir Admin a AdminDto (convierte de entidad a DTO)
     private UserDto toDto(Client client) {
-        return new UserDto(client.getId(), client.getName(), client.getEmail(), client.getAddress(), client.getPhone(), client.getPassword(), "CLIENT");
+        return new UserDto(client.getId(), client.getName(), client.getEmail(), client.getAddress(),
+                client.getPhone(), client.getPassword(), "CLIENT", client.getImage());
     }
 
     @Override
@@ -77,26 +79,6 @@ public class ClientServiceImplementation implements iClientService {
         return toDto(savedClient);  // Convierte entidad a DTO y devuelve
 
     }
-
-/*    @Override
-    public UserDto updateClient(UserDto clientDto) {
-        // Buscar el admin por su ID en la base de datos
-        Optional<User> existingUser = userRepository.findById(clientDto.getId());
-
-        // Verifica que el usuario encontrado sea un Admin
-        if (existingUser.isPresent() && existingUser.get() instanceof Client) {
-            Client clientToUpdate = (Client) existingUser.get();  // Hacemos casting a Admin
-            // Actualizar los campos necesarios
-            clientToUpdate.setName(clientDto.getName());
-            clientToUpdate.setEmail(clientDto.getEmail());
-            clientToUpdate.setAddress(clientDto.getAddress());
-            clientToUpdate.setPhone(clientDto.getPhone());
-            Client updatedClient = userRepository.save(clientToUpdate);  // Guardar cambios
-            return toDto(updatedClient);  // Convertir a DTO y devolver
-        } else {
-            throw new RuntimeException("Admin no encontrado con ID: " + clientDto.getId());
-        }
-    }*/
 
     @Override
     public UserDto updateClient(UserDto clientDto) {
@@ -246,5 +228,44 @@ public class ClientServiceImplementation implements iClientService {
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
+
+
+
+    public void generateRecoveryCode(String email) {
+        // Buscar al usuario por correo
+        Client client = userRepository.findByEmail(email);
+        if (client == null) {
+            throw new RuntimeException("Usuario no encontrado con este correo");
+        }
+
+        // Generar clave de 4 dígitos
+        String recoveryCode = String.format("%04d", new Random().nextInt(10000));
+        LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(15);
+
+        // Actualizar la clave y su expiración en el usuario
+        client.setRecoveryCode(recoveryCode);
+        client.setRecoveryCodeExpiration(expirationTime);
+        userRepository.save(client);
+
+        // Enviar correo con la clave
+        String emailBody = "Tu código de recuperación es: " + recoveryCode + ". Este código es válido por 15 minutos.";
+        emailService.sendRecoveryEmail(client.getEmail(), "Código de Recuperación", emailBody);
     }
+
+    public boolean validateRecoveryCode(String email, String code) {
+        // Buscar al usuario por correo
+        Client client = userRepository.findByEmail(email);
+        if (client == null) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+
+        // Validar la clave y su tiempo de expiración
+        if (client.getRecoveryCode() != null &&
+                client.getRecoveryCode().equals(code) &&
+                client.getRecoveryCodeExpiration().isAfter(LocalDateTime.now())) {
+            return true;
+        }
+        return false;
+    }
+}
 

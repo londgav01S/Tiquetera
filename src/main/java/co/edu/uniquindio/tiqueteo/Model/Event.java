@@ -25,6 +25,7 @@ public class Event {
     EventType type;
     String image;
     LocalDate eventDate;
+    String City;
 
     List<Locality> localities;
 

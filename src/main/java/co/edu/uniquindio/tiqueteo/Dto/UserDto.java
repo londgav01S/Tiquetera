@@ -15,5 +15,6 @@ public class UserDto {
     private String phone;
     private String password;
     private String role;  // Podría ser ADMIN por defecto
+    private String image;
 
 }

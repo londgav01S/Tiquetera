@@ -1,5 +1,6 @@
 package co.edu.uniquindio.tiqueteo.Dto;
 
+
 import lombok.*;
 
 @Data
@@ -7,12 +8,10 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-public class ClientDto {
+public class CouponDto {
     private String id;
+    private String code;
     private String name;
-    private String email;
-    private String address;
-    private String phone;
-    private String password;
-    private String image;
+    private Double percentage;
+    private String date;
 }

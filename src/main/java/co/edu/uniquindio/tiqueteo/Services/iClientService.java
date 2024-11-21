@@ -22,4 +22,5 @@ public interface iClientService {
      PurchaseDto getTicketById(String id);
      List getAllTicketsByClient(String clientId);
 
+     boolean validateRecoveryCode(String email, String code);
 }

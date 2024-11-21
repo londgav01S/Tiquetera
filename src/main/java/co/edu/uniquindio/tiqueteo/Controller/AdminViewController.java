@@ -1,9 +1,7 @@
 package co.edu.uniquindio.tiqueteo.Controller;
 
-import co.edu.uniquindio.tiqueteo.Dto.EventDto;
-import co.edu.uniquindio.tiqueteo.Dto.RangeDateDto;
-import co.edu.uniquindio.tiqueteo.Dto.ReportDto;
-import co.edu.uniquindio.tiqueteo.Dto.UserDto;
+import co.edu.uniquindio.tiqueteo.Dto.*;
+import co.edu.uniquindio.tiqueteo.Services.ICouponService;
 import co.edu.uniquindio.tiqueteo.Services.iAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +19,9 @@ public class AdminViewController {
     @Autowired
     private iAdminService adminService;
 
+    @Autowired
+    private ICouponService couponService;
+
 
     @GetMapping("/report")
     public ReportDto generateReport(@RequestBody RangeDateDto rangeDateDto) {
@@ -30,7 +31,7 @@ public class AdminViewController {
         return adminService.generateReport(rangeDateDto);
     }
 
-        // Crear un nuevo admin: POST /api/admin
+    // Crear un nuevo admin: POST /api/admin
     @PostMapping("/register")
     public UserDto create(@RequestBody UserDto userDto) {
         return adminService.createAdmin(userDto);
@@ -65,6 +66,8 @@ public class AdminViewController {
     // Crear un nuevo evento
     @PostMapping("/createEvent")
     public EventDto create(@RequestBody EventDto eventDto) {
+        eventDto.setId(null);
+        System.out.println("Entrando a createEvent" + eventDto.getName());
         return adminService.createEvent(eventDto);
     }
 
@@ -78,6 +81,7 @@ public class AdminViewController {
     @DeleteMapping("/{id}/deleteEvent")
     public void deleteEvent(@PathVariable String id) {
         EventDto eventDelete = adminService.getEventById(id);
+        System.out.println("Eliminando evento...");
         adminService.deleteEvent(eventDelete);
     }
 
@@ -93,5 +97,12 @@ public class AdminViewController {
         return adminService.getAllEvents();
     }
 
+    //--------------------------------------------------------------------------------
+
+    @PostMapping("/createCoupon")
+    public CouponDto createCoupon(@RequestBody CouponDto couponDto) {
+        System.out.println("Creando cupón...");
+        return couponService.createCoupon(couponDto);
+    }
 
 }

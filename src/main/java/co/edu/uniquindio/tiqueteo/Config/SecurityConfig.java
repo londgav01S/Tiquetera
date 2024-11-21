@@ -22,7 +22,14 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeRequests(authorize -> authorize
-                        .requestMatchers("/api/client/login", "/login", "/api/outh/google").permitAll() // Permitir estas rutas
+                        .requestMatchers("/api/client/login", "/login", "/api/outh/google",
+                                "/api/client/registerUser",
+                                "/api/client/updateClient",
+                                "/api/admin/createCoupon",
+                                "/api/admin/createEvent",
+                                "/api/admin/allEvents",
+                                "/api/admin/{id}/deleteEvent"
+                                ).permitAll() // Permitir estas rutas
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
