@@ -16,7 +16,7 @@ public interface iClientService {
      void deleteClient(UserDto clientDto);
      UserDto getClientById(String clientId);
      List<UserDto> getAllClient();
-
+     public void generateRecoveryCode(String email);
      PurchaseDto buyTicket(PurchaseDto purchaseDto);
      PurchaseDto cancelTicket(PurchaseDto purchaseDto);
      PurchaseDto getTicketById(String id);

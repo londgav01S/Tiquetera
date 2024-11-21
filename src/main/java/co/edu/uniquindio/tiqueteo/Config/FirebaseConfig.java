@@ -10,7 +10,8 @@ import java.io.IOException;
 
 @Configuration
 public class FirebaseConfig {
-    /*@Bean
+    /**
+    @Bean
     public FirebaseApp initializeFirebase() throws IOException {
         // Obtener la ruta del archivo desde la variable de entorno "firebaseAPI"
         String firebasePath = System.getenv("firebaseAPI");
@@ -26,8 +27,8 @@ public class FirebaseConfig {
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .build();
         return FirebaseApp.initializeApp(options);
-    }*/
-
+    }
+    */
     @Bean
     public FirebaseApp initializeFirebase() throws IOException {
         // Obtener la ruta del archivo desde la variable de entorno "firebaseAPI"
@@ -50,5 +51,4 @@ public class FirebaseConfig {
             return FirebaseApp.getInstance();
         }
     }
-
 }
