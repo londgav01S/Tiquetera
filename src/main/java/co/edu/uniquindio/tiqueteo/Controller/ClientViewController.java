@@ -4,6 +4,7 @@ import co.edu.uniquindio.tiqueteo.Dto.ClientDto;
 import co.edu.uniquindio.tiqueteo.Dto.LoginDto;
 import co.edu.uniquindio.tiqueteo.Dto.PurchaseDto;
 import co.edu.uniquindio.tiqueteo.Dto.UserDto;
+import co.edu.uniquindio.tiqueteo.Model.Client;
 import co.edu.uniquindio.tiqueteo.Services.iClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/client")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin
 public class ClientViewController {
 
     private final iClientService clientService;
@@ -25,19 +26,23 @@ public class ClientViewController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
-        System.out.println("Entrando a login");
-        boolean loginSuccess = clientService.login(loginDto);
-        if (loginSuccess) {
-            return ResponseEntity.ok("Inicio de sesión exitoso");
-        } else {
+    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
+        try {
+            // Llama al servicio de login y obtiene el cliente
+            Client client = clientService.login(loginDto);
+
+            // Devuelve el cliente como respuesta si el inicio de sesión es exitoso
+            return ResponseEntity.ok(client);
+        } catch (RuntimeException e) {
+            // Devuelve un error 401 si las credenciales son incorrectas
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
         }
     }
 
     // Crear un nuevo admin: POST /api/admin
-    @PostMapping ("/register")
+    @PostMapping ("/registerUser")
     public UserDto create(@RequestBody UserDto clientDto) {
+        System.out.println("Entrando a create");
         return clientService.createClient(clientDto);
     }
 

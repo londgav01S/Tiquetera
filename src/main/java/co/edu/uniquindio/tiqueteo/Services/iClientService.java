@@ -4,12 +4,13 @@ import co.edu.uniquindio.tiqueteo.Dto.ClientDto;
 import co.edu.uniquindio.tiqueteo.Dto.LoginDto;
 import co.edu.uniquindio.tiqueteo.Dto.PurchaseDto;
 import co.edu.uniquindio.tiqueteo.Dto.UserDto;
+import co.edu.uniquindio.tiqueteo.Model.Client;
 import co.edu.uniquindio.tiqueteo.Model.Purchase;
 
 import java.util.List;
 
 public interface iClientService {
-     boolean login (LoginDto loginDto);
+     Client login (LoginDto loginDto);
      UserDto createClient (UserDto clientDto);
      UserDto updateClient(UserDto clientDto);
      void deleteClient(UserDto clientDto);
