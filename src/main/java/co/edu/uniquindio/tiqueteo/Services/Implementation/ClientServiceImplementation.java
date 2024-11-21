@@ -69,18 +69,26 @@ public class ClientServiceImplementation implements iClientService {
     }
 
     @Override
-    public boolean login(LoginDto loginDto) {
-        // Buscar el cliente por email
-        Client client = userRepository.findByEmail(loginDto.getEmail());
+    public Client login(LoginDto loginDto) {
 
-        if (client != null) {
+        String email = loginDto.getEmail().toLowerCase();
+        System.out.println(email);
+        // Buscar el cliente por email
+        User user = userRepository.findByEmail(email);
+
+        // Verificar si el usuario existe y es de tipo Client
+        if (user != null && user instanceof Client) {
+            Client client = (Client) user;
+
             // Verificar la contraseña directamente (sin BCrypt)
             if (loginDto.getPassword().equals(client.getPassword())) {
-                return true;  // Inicio de sesión exitoso
+                return client;  // Retornar el cliente si el inicio de sesión es exitoso
             }
         }
-        return false;  // Credenciales incorrectas
+
+        throw new RuntimeException("Credenciales incorrectas");  // Lanza una excepción si las credenciales son incorrectas
     }
+
     // Convertir AdminDto a Admin (convierte de DTO a entidad)
     private Client toEntity(UserDto clientDto) {
         Client client = new Client();

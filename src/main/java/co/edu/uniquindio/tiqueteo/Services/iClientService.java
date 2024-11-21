@@ -10,7 +10,7 @@ import co.edu.uniquindio.tiqueteo.Model.Purchase;
 import java.util.List;
 
 public interface iClientService {
-
+     Client login (LoginDto loginDto);
      UserDto createClient (UserDto clientDto);
      UserDto updateClient(UserDto clientDto);
      void deleteClient(UserDto clientDto);
@@ -21,5 +21,6 @@ public interface iClientService {
      PurchaseDto cancelTicket(PurchaseDto purchaseDto);
      PurchaseDto getTicketById(String id);
      List getAllTicketsByClient(String clientId);
-     boolean login(LoginDto loginDto);
+
+     boolean validateRecoveryCode(String email, String code);
 }
