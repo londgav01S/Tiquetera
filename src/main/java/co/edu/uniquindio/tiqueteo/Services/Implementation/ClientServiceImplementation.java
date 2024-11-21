@@ -49,7 +49,7 @@ public class ClientServiceImplementation implements iClientService {
 
         // Enviar correo con la clave
         String emailBody = "Tu código de recuperación es: " + recoveryCode + ". Este código es válido por 15 minutos.";
-        emailService.sendEmailWithBody(client.getEmail(), "Código de Recuperación", emailBody);
+        emailService.sendRecoveryEmail(client.getEmail(), "Código de Recuperación", emailBody);
     }
 
     public boolean validateRecoveryCode(String email, String code) {

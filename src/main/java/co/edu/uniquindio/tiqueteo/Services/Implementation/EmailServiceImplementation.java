@@ -41,7 +41,7 @@ public class EmailServiceImplementation implements IEmailService {
     }
 
     @Override
-    public void sendEmailWithBody(String toEmail, String subject, String body) {
+    public void sendRecoveryEmail(String toEmail, String subject, String body) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("no-reply@tiqueteo.com");
         message.setTo(toEmail);
@@ -59,10 +59,8 @@ public class EmailServiceImplementation implements IEmailService {
             helper.setTo(toEmail);
             helper.setSubject(purchaseSubject);
             helper.setText(purchaseBody);
-
             // Adjuntar el archivo QR
             helper.addAttachment("QR_Code.png", qrFile);
-
             mailSender.send(message);
             System.out.println("Correo enviado con el QR adjunto a: " + toEmail);
         } catch (Exception e) {
