@@ -1,5 +1,6 @@
 package co.edu.uniquindio.tiqueteo.Services.Implementation;
 
+import co.edu.uniquindio.tiqueteo.Dto.CouponDto;
 import co.edu.uniquindio.tiqueteo.Model.Coupon;
 import co.edu.uniquindio.tiqueteo.Model.Purchase;
 import co.edu.uniquindio.tiqueteo.Repositories.CouponRepository;
@@ -15,6 +16,27 @@ public class CouponServiceImplementation implements ICouponService {
 
     @Autowired
     private CouponRepository couponRepository;
+
+    private CouponDto ToCouponDto(Coupon coupon) {
+        return new CouponDto(coupon.getId(), coupon.getCode(), coupon.getName(), coupon.getPercentage(), coupon.getDate());
+    }
+
+    private Coupon toEntity(CouponDto couponDto) {
+        Coupon coupon = new Coupon();
+        coupon.setId(couponDto.getId());
+        coupon.setCode(couponDto.getCode());
+        coupon.setName(couponDto.getName());
+        coupon.setPercentage(couponDto.getPercentage());
+        coupon.setDate(couponDto.getDate());
+        return coupon;
+    }
+
+    @Override
+    public CouponDto createCoupon(CouponDto couponDto) {
+        Coupon coupon = toEntity(couponDto);
+        Coupon couponSaved= couponRepository.save(coupon);
+        return ToCouponDto(couponSaved);
+    }
 
     @Override
     public Coupon findCouponByCode(String couponCode) {

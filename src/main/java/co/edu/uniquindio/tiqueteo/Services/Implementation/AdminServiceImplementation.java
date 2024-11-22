@@ -98,13 +98,14 @@ public class AdminServiceImplementation implements iAdminService {
         admin.setEmail(userDto.getEmail());
         admin.setAddress(userDto.getAddress());
         admin.setPhone(userDto.getPhone());
-        admin.setRole(userDto.getRole() != null ? userDto.getRole() : "ADMIN");  // Asigna rol predeterminado si no se pasa
+        admin.setRole(userDto.getRole() != null ? userDto.getRole() : "ADMIN");// Asigna rol predeterminado si no se pasa
+        admin.setImage(userDto.getImage());
         return admin;
     }
 
     // Convertir Admin a AdminDto (convierte de entidad a DTO)
     private UserDto toDto(Admin admin) {
-        return new UserDto(admin.getId(), admin.getName(), admin.getEmail(), admin.getAddress(), admin.getPhone(), admin.getPassword(), admin.getRole());
+        return new UserDto(admin.getId(), admin.getName(), admin.getEmail(), admin.getAddress(), admin.getPhone(), admin.getPassword(), admin.getRole(), admin.getImage());
     }
 
     @Override
@@ -175,12 +176,17 @@ public class AdminServiceImplementation implements iAdminService {
         event.setAddress(eventDto.getAddress());
         event.setEventDate(eventDto.getEventDate());
         event.setLocalities(eventDto.getLocalities());
+        event.setCity(eventDto.getCity());
+        event.setDescription(eventDto.getDescription());
+        event.setImage(eventDto.getImage());
+        event.setType(eventDto.getType());
         return event;
     }
 
     // Convertir Admin a AdminDto (convierte de entidad a DTO)
     private EventDto toDto(Event event) {
-        return new EventDto(event.getId(), event.getName(), event.getAddress(), event.getEventDate(), event.getLocalities());
+        return new EventDto(event.getId(), event.getName(), event.getAddress(), event.getEventDate(),
+                event.getLocalities(), event.getCity(), event.getDescription(), event.getImage(), event.getType());
     }
 
     @Override

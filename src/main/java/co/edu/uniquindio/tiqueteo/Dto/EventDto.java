@@ -1,5 +1,6 @@
 package co.edu.uniquindio.tiqueteo.Dto;
 
+import co.edu.uniquindio.tiqueteo.Model.Enums.EventType;
 import co.edu.uniquindio.tiqueteo.Model.Locality;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,4 +21,8 @@ public class EventDto {
     String address;
     LocalDate eventDate;
     List<Locality> localities;
+    String City;
+    String description;
+    String image;
+    EventType type;
 }
