@@ -41,6 +41,7 @@ public class EmailServiceImplementation implements IEmailService {
     }
 
     @Override
+<<<<<<< HEAD
     public void sendRecoveryEmail(String toEmail, String subject, String body) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("no-reply@tiqueteo.com");
@@ -51,6 +52,8 @@ public class EmailServiceImplementation implements IEmailService {
     }
 
     @Override
+=======
+>>>>>>> Londoño
     public void sendPurchaseEmail(String toEmail, File qrFile) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -67,6 +70,16 @@ public class EmailServiceImplementation implements IEmailService {
             System.err.println("Error al enviar el correo: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void sendRecoveryEmail(String toEmail, String subject, String body) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("no-reply@tiqueteo.com");
+        message.setTo(toEmail);
+        message.setSubject(subject);
+        message.setText(body);
+        mailSender.send(message);
     }
 }
 
