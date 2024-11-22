@@ -49,6 +49,7 @@ public class ClientViewController {
     // Actualizar un admin: PUT /api/admin
     @PutMapping("/updateClient")
     public UserDto update(@RequestBody UserDto clientDto) {
+        System.out.println("Entrando a update" + clientDto.getName() +" "+clientDto.getImage());
         return clientService.updateClient(clientDto);
     }
 
@@ -73,6 +74,7 @@ public class ClientViewController {
     // Crear una nueva compra
     @PostMapping("/buyTicket")
     public PurchaseDto buyTicket(@RequestBody PurchaseDto purchaseDto) {
+        System.out.println("Entrando a buyTicket");
         return clientService.buyTicket(purchaseDto);
     }
 

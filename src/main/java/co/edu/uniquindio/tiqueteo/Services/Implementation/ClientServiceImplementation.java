@@ -93,6 +93,7 @@ public class ClientServiceImplementation implements iClientService {
             clientToUpdate.setEmail(clientDto.getEmail());
             clientToUpdate.setAddress(clientDto.getAddress());
             clientToUpdate.setPhone(clientDto.getPhone());
+            clientToUpdate.setImage((clientDto.getImage()));
             clientToUpdate.setPassword(clientDto.getPassword()); // Asegúrate de actualizar la contraseña
             Client updatedClient = userRepository.save(clientToUpdate);  // Guardar cambios
             return toDto(updatedClient);  // Convertir a DTO y devolver
@@ -263,6 +264,16 @@ public class ClientServiceImplementation implements iClientService {
         if (client.getRecoveryCode() != null &&
                 client.getRecoveryCode().equals(code) &&
                 client.getRecoveryCodeExpiration().isAfter(LocalDateTime.now())) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean updatePassword(String email, String newPassword) {
+        Client client = userRepository.findByEmail(email);
+        if (client != null) {
+            client.setPassword(newPassword); // Asegúrate de encriptar la contraseña antes de guardarla
+            userRepository.save(client);
             return true;
         }
         return false;

@@ -21,6 +21,6 @@ public interface iClientService {
      PurchaseDto cancelTicket(PurchaseDto purchaseDto);
      PurchaseDto getTicketById(String id);
      List getAllTicketsByClient(String clientId);
-
+     boolean updatePassword(String email, String newPassword);
      boolean validateRecoveryCode(String email, String code);
 }

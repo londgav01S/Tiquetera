@@ -5,15 +5,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
@@ -28,7 +31,11 @@ public class SecurityConfig {
                                 "/api/admin/createCoupon",
                                 "/api/admin/createEvent",
                                 "/api/admin/allEvents",
-                                "/api/admin/{id}/deleteEvent"
+                                "/api/admin/{id}/deleteEvent",
+                                "/api/client/buyTicket",
+                                "/api/recovery-code",
+                                "/api/validate-code",
+                                "/api/update-password"
                                 ).permitAll() // Permitir estas rutas
                         .anyRequest().authenticated()
                 )
@@ -56,7 +63,16 @@ public class SecurityConfig {
     @Bean
     public AuthenticationSuccessHandler redirectSuccessHandler() {
         return (HttpServletRequest request, HttpServletResponse response, org.springframework.security.core.Authentication authentication) -> {
-            response.sendRedirect("https://localhost:3000/home"); // URL del frontend tras login exitoso
-};
+            response.sendRedirect("https://localhost:3000/home");};
+    }
+
+    @Bean public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedHeader("*"); config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
     }
 }
